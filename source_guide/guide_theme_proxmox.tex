@@ -1,0 +1,161 @@
+% Guide d'utilisation — Thème Proxmox Cyberpunk V29
+% Compilation, depuis ce dossier : lualatex guide_theme_proxmox.tex (ou : tectonic guide_theme_proxmox.tex)
+% Sous Debian : apt install texlive-luatex texlive-latex-extra texlive-pictures texlive-lang-french
+%               fonts-lato fonts-dejavu-core
+% Fournis ici : la capture 3_interface.png et la police Orbitron (SIL OFL 1.1, texte dans ../OFL-Orbitron.txt).
+\documentclass[9pt]{extarticle}
+\usepackage[a4paper,margin=11mm,top=9mm,bottom=8mm]{geometry}
+\usepackage{fontspec}
+\usepackage[french]{babel}
+\usepackage{xcolor,graphicx,tikz,multicol,enumitem,tabularx,array}
+\usepackage[most]{tcolorbox}
+\usepackage{microtype}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+
+\setmainfont{Lato}[UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Italic,BoldItalicFont=*-BoldItalic]
+\setmonofont{DejaVu Sans Mono}[Scale=0.84]
+\newfontfamily\orbitron{Orbitron-900.ttf}[Path=./]
+\newfontfamily\orbitronb{Orbitron-700.ttf}[Path=./]
+\newfontfamily\latoblack{Lato-Black}
+
+\definecolor{nuit}{HTML}{0A0E1A}
+\definecolor{nuit2}{HTML}{14233F}
+\definecolor{cyan}{HTML}{00B8D9}
+\definecolor{cyanvif}{HTML}{00E5FF}
+\definecolor{vert}{HTML}{00A86B}
+\definecolor{rouge}{HTML}{CC2244}
+\definecolor{encre}{HTML}{1B2433}
+\definecolor{gris}{HTML}{5B6676}
+\definecolor{fondcode}{HTML}{0F1A2E}
+
+\graphicspath{{./}{../captures/}}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+\setlength{\columnsep}{7mm}
+\color{encre}
+\setlist{nosep,leftmargin=11pt,itemsep=1pt,label={\color{cyan}\scriptsize$\blacktriangleright$}}
+
+% Titre de rubrique
+\newcommand{\rubrique}[1]{%
+  \par\vspace{5pt}{\orbitronb\fontsize{9.6}{11}\selectfont\color{nuit2}\MakeUppercase{#1}}\par
+  \vspace{-2pt}{\color{cyan}\rule{\linewidth}{0.9pt}}\par\vspace{2pt}}
+
+% Bloc de commandes (fond sombre comme le thème)
+\newtcolorbox{commande}{enhanced,colback=fondcode,colframe=cyan!70!black,boxrule=0.5pt,arc=2pt,
+  left=4pt,right=4pt,top=2.5pt,bottom=2.5pt,fontupper=\ttfamily\color{cyanvif!35!white},before skip=3pt,after skip=4pt}
+\newcommand{\cmt}[1]{{\color{gris!80!white}\##1}}
+\newcommand{\opt}[1]{{\ttfamily\bfseries\color{nuit2}#1}}
+\newcommand{\optt}[1]{{\ttfamily\bfseries\color{nuit2}\fontsize{7.6}{9}\selectfont #1}}
+\newcommand{\chemin}[1]{{\ttfamily\small #1}}
+
+\begin{document}
+
+% ───────────── Bandeau ─────────────
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[nuit] (current page.north west) rectangle ([yshift=-35mm]current page.north east);
+  \shade[left color=nuit, right color=nuit2] ([yshift=-35mm]current page.north west) rectangle ([yshift=-32mm]current page.north east);
+  \fill[cyanvif] ([yshift=-35mm]current page.north west) rectangle ([yshift=-35.8mm]current page.north east);
+  \foreach \x/\y/\r in {0.12/0.35/0.5, 0.31/0.7/0.35, 0.55/0.25/0.45, 0.72/0.62/0.3, 0.88/0.4/0.5, 0.95/0.75/0.3}
+    \fill[cyanvif,opacity=0.55] ([xshift=\x*\paperwidth,yshift=-\y*26mm]current page.north west) circle (\r pt);
+\end{tikzpicture}
+\vspace*{-1mm}
+{\orbitron\fontsize{22}{24}\selectfont\color{cyanvif}THÈME PROXMOX CYBERPUNK}\par
+\vspace{1mm}
+{\fontsize{11}{13}\selectfont\color{white}\textbf{Guide d'installation pour collègues} \;—\; V29 \;—\; Proxmox VE 8 et 9}\par
+\vspace{0.8mm}
+{\small\color{cyanvif!60!white}Damien SCONTRINO — BTS SIO, lycée Louis Armand (Nogent-sur-Marne) — réutilisation pédagogique libre (CC BY-NC-SA 4.0)}\par
+\vspace{1mm}
+{\small\color{white}Télécharger le script et ce guide :
+\href{https://github.com/SCONTRINO-Hub/proxmox-theme-neon-cyberpunk}{\color{cyanvif}\textbf{github.com/SCONTRINO-Hub/proxmox-theme-neon-cyberpunk}}}\par
+\vspace{4mm}
+
+\begin{multicols}{2}
+
+\rubrique{Ce que fait ce script}
+Il habille l'interface web de Proxmox VE en \textbf{bleu néon} :
+\begin{itemize}
+  \item fond sombre animé, menus, fenêtres et graphiques assortis ;
+  \item icônes colorées selon l'état : {\color{rouge}\textbf{VM arrêtée}}, VM en marche,
+        \textcolor{violet}{\textbf{modèle}} ;
+  \item un \textbf{badge} dans la barre du haut (établissement, nom du nœud…) ;
+  \item en option, désactivées par défaut : message d'accueil après la connexion,
+        retrait de la fenêtre « No valid subscription ».
+\end{itemize}
+\textbf{Aucun téléchargement, aucun service redémarré, retour arrière en une commande.}
+C'est un thème \textbf{sombre} : il impose le fond sombre même si le nœud était en interface claire ;
+la désinstallation rend la main à ce réglage.
+
+\rubrique{Prérequis}
+\begin{itemize}
+  \item Proxmox VE \textbf{8.x} ou \textbf{9.x}, n'importe quel nom de nœud.
+  \item Un accès \textbf{root} (console, shell web ou SSH). Rien à installer : bash, perl et coreutils suffisent.
+  \item En cluster : lancer le script \textbf{sur chaque nœud}.
+\end{itemize}
+
+\rubrique{Après une mise à jour de Proxmox}
+Quand Proxmox met à jour son interface, le thème disparaît, sans rien casser : \textbf{relancez le script}
+(menu \textbf{1} puis Entrée), ou laissez-le \textbf{revenir tout seul} (\textbf{o} à la question du menu,
+ou \opt{-{}-auto-maj}).
+
+\columnbreak
+
+\rubrique{Installation}
+Copier le script sur le serveur, puis en root :
+\begin{commande}
+chmod +x install\_theme\_proxmox.sh\\
+./install\_theme\_proxmox.sh \cmt{ menu interactif}
+\end{commande}
+Le menu propose : \textbf{1} installer ou mettre à jour, \textbf{2} désinstaller. Il pose quatre questions
+(badge, message, fenêtre d'abonnement, mises à jour). Ensuite : \textbf{Ctrl+F5} dans le navigateur.
+Installation directe, sans question (réglages non précisés inchangés) :
+\begin{commande}
+./install\_theme\_proxmox.sh --installer --badge "\%NODE\% - Lycée X"
+\end{commande}
+
+
+
+\rubrique{Ce qui est modifié (et rien d'autre)}
+\begin{itemize}
+  \item \chemin{index.html.tpl} : 2 lignes \texttt{<link>} (la base sombre de Proxmox, puis le thème)
+        et, si option, 1 \texttt{<script>} — toutes repérées par la marque \texttt{theme-proxmox-cyberpunk} ;
+  \item une feuille de style (police intégrée) et, si option, un petit script ;
+  \item \chemin{proxmoxlib.js} \emph{uniquement} avec \opt{--sans-abonnement} ;
+  \item avec \opt{--auto-maj} : un fichier dans \chemin{/etc/apt/apt.conf.d/}, une copie du script
+        dans \chemin{/usr/local/sbin/}.
+\end{itemize}
+{\raggedright Originaux copiés dans \chemin{/var/backups/theme-proxmox-cyberpunk/}.
+Venant de la V28 : son crochet APT (jamais lancé par apt, par erreur), \chemin{/opt} et son journal
+sont remplacés ou retirés ; ses sauvegardes (\chemin{/root/sauvegardes-theme-proxmox/}) restent.\par}
+
+\end{multicols}
+
+\vspace{1mm}
+\newcommand{\cadre}[1]{%
+  \begin{tcolorbox}[enhanced,colback=nuit,colframe=cyan!70!black,boxrule=0.6pt,arc=2pt,
+    left=0pt,right=0pt,top=0pt,bottom=0pt,drop fuzzy shadow=cyan!40!black]
+    \includegraphics[width=\linewidth]{#1}
+  \end{tcolorbox}}
+
+\begin{center}\begin{minipage}{0.89\linewidth}\cadre{3_interface.png}\end{minipage}\end{center}\vspace{-2pt}
+{\small\textbf{Vue d'un nœud.} VM arrêtée en rouge, modèles en violet, conteneur, réseau et
+stockages ; badge, menus, grilles et barre des tâches au même style.
+\textcolor{gray}{Interface réelle ; seuls les noms de comptes d'étudiants ont été retirés.}}\par
+
+
+\vspace{1mm}
+\begin{tcolorbox}[enhanced,colback=cyan!6,colframe=cyan!60!black,boxrule=0.8pt,arc=3pt,
+                  left=8pt,right=8pt,top=4pt,bottom=4pt]
+{\orbitron\fontsize{10}{12}\selectfont\color{cyan!55!black}ET SI ÇA NE VOUS PLAÎT PAS ?}\par\vspace{2mm}
+\small Tout se défait, et rien ne vous engage : menu \textbf{« 2) Désinstaller »}, ou
+\texttt{./install\_theme\_proxmox.sh -{}-desinstaller}. Le script retire ses lignes et ses fichiers,
+et remet \chemin{proxmoxlib.js} tel qu'il l'avait trouvé (si un autre outil l'a retouché depuis,
+il n'y touche pas et le dit).
+\end{tcolorbox}
+
+\vspace{1mm}
+{\scriptsize\color{gris}\raggedright CC BY-NC-SA 4.0 — © 2025-2026 Damien SCONTRINO (damien.scontrino@ac-creteil.fr).
+Police Orbitron © 2018 The Orbitron Project Authors, SIL OFL 1.1 (\texttt{OFL-Orbitron.txt}).\par}
+
+\end{document}

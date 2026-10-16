@@ -1,0 +1,8 @@
+# Fins de ligne Unix pour les scripts, même après un « git clone » sous Windows
+*.sh   text eol=lf
+*.md   text eol=lf
+*.tex  text eol=lf
+*.html text eol=lf
+*.png  binary
+*.pdf  binary
+*.ttf  binary
